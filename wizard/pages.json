@@ -1,0 +1,19 @@
+, {
+    "step_title": "Invoice Ninja",
+    "items": [{
+        "type": "textfield",
+        "desc": "Your Invoice Ninja account is made at the first start, with a strong password shown once in the Invoice Ninja window in DSM. The first start sets up the database and takes a few minutes.",
+        "subitems": [
+            { "key": "wizard_admin_email", "desc": "Your email (sign-in)", "defaultValue": "", "validator": { "allowBlank": false, "regex": { "expr": "/^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}\$/", "errorText": "Looks like you@example.com" } } },
+            { "key": "wizard_admin_name", "desc": "Your name", "defaultValue": "", "validator": { "allowBlank": false, "regex": { "expr": "/^[A-Za-z0-9 ._@-]{1,60}\$/", "errorText": "Letters, digits and spaces — up to 60" } } }
+        ]
+    }, {
+        "type": "singleselect",
+        "desc": "HTTPS keeps your figures and your clients' details private on the way. It can be switched later in the window.",
+        "subitems": [
+            { "key": "wizard_tls_off", "desc": "Plain HTTP (on your own network, or behind DSM's reverse proxy)", "defaultValue": true },
+            { "key": "wizard_tls_dsm", "desc": "HTTPS with DSM's certificate: the system default from Control Panel → Security → Certificate", "defaultValue": false },
+            { "key": "wizard_tls_self", "desc": "HTTPS with a self-signed certificate made by the package (browsers warn once)", "defaultValue": false }
+        ]
+    }]
+}

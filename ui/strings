@@ -1,0 +1,2 @@
+invoiceoverdue="Invoice {0} to {1} is now overdue. Open Invoice Ninja from the main menu → Business, or send the client a reminder from Invoice Ninja."
+invoicesoverdue="{0} invoices went overdue since the last check. Open Invoice Ninja from the main menu → Business."

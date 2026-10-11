@@ -1,0 +1,29 @@
+    <section data-page="business" hidden>
+      <div class="note">Where things stand in <a class="in-link" href="#" target="_blank" rel="noopener">Invoice Ninja</a>. Invoices, quotes, clients and payments are all made there.</div>
+      <div class="tiles" id="bz-tiles"></div>
+      <div class="card"><h2>Overdue</h2><table><thead><tr><th>Invoice</th><th>Client</th><th class="n">Still owed</th><th>Due</th></tr></thead><tbody id="bz-overdue"></tbody></table></div>
+      <div class="card"><h2>When an invoice goes overdue</h2><div class="in">
+        <p class="muted small">DSM tells its administrators — the bell in DSM, and your phone through DSM's notifications. Invoice Ninja can also remind the client itself: Settings → Workflow Settings → Reminders.</p>
+        <p><span id="bz-alert"></span> <span id="bz-alert-btn"></span></p></div></div>
+    </section>
+
+    <section data-page="users" hidden>
+      <div class="note">Who can sign in to Invoice Ninja (add people in Invoice Ninja → Settings → User Management). Locked out? Make a new password — it's shown once — or turn off two-step sign-in for someone who lost their phone.</div>
+      <div class="card"><table><thead><tr><th>User</th><th>Role</th><th>Two-step</th><th>Last sign-in</th><th class="n"></th></tr></thead><tbody id="users"></tbody></table></div>
+    </section>
+
+    <section data-page="mail" hidden>
+      <div class="note">Invoice Ninja emails your invoices, quotes, receipts and reminders. Without a mail server it can't send them — fill one in here (your email provider's SMTP settings).</div>
+      <div class="card"><h2>Mail server</h2><div class="in">
+        <label class="f"><span>SMTP server</span><input type="text" id="ml-host" placeholder="smtp.example.com — empty to turn mail off"></label>
+        <label class="f"><span>Port</span><input type="number" id="ml-port" placeholder="587" style="max-width:140px"></label>
+        <label class="f"><span>Security</span><select id="ml-enc"><option value="tls">STARTTLS (usually port 587)</option><option value="ssl">SSL/TLS (usually port 465)</option><option value="none">None</option></select></label>
+        <label class="f"><span>Username</span><input type="text" id="ml-user" autocomplete="off"></label>
+        <label class="f"><span>Password</span><input type="password" id="ml-pass" autocomplete="new-password" placeholder="(unchanged)"></label>
+        <label class="f"><span>From address</span><input type="text" inputmode="email" autocomplete="off" id="ml-from" placeholder="invoices@example.com"></label>
+        <label class="f"><span>From name</span><input type="text" id="ml-name" maxlength="80" placeholder="Your business"></label>
+        <button class="btn primary" id="ml-save" data-app>Save</button></div></div>
+      <div class="card"><h2>Send a test</h2><div class="in">
+        <label class="f"><span>To</span><input type="text" inputmode="email" autocomplete="off" id="ml-to" placeholder="you@example.com"></label>
+        <button class="btn" id="ml-test" data-app>Send</button></div></div>
+    </section>

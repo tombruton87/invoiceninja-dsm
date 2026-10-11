@@ -1,0 +1,103 @@
+# Invoice Ninja, as the Synology package runs it: the compose project in the
+# invoiceninja shared folder. The setup container writes .env beside this.
+# app (PHP, the queue worker and the scheduler), web (nginx in front, with the
+# HTTPS certificate) and db (MariaDB) keep their data in volumes; backups go to
+# the share.
+services:
+  db:
+    image: ${DB_IMAGE:-mariadb:11.4}
+    container_name: invoiceninja-db
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      # UTC, as Laravel assumes: on local time the database would store its times an hour off in summer.
+      TZ: UTC
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ninja
+      MARIADB_USER: ninja
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  app:
+    image: ${IN_IMAGE:-invoiceninja/invoiceninja-debian:5}
+    container_name: invoiceninja-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - public:/var/www/html/public
+      - storage:/var/www/html/storage
+    environment:
+      TZ: ${TZ:-UTC}
+      APP_URL: ${APP_URL}
+      APP_KEY: ${APP_KEY}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      REQUIRE_HTTPS: ${REQUIRE_HTTPS:-false}
+      TRUSTED_PROXIES: "*"
+      IS_DOCKER: "true"
+      PDF_GENERATOR: snappdf
+      FILESYSTEM_DISK: debian_docker
+      # No Redis: the queue, cache and sessions use the database and files.
+      QUEUE_CONNECTION: database
+      CACHE_DRIVER: file
+      SESSION_DRIVER: file
+      SCOUT_DRIVER: "null"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ninja
+      DB_USERNAME: ninja
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Only for the very first start (the image won't start without them): a throwaway password the package replaces at once.
+      IN_USER_EMAIL: ${IN_USER_EMAIL:-}
+      IN_PASSWORD: ${IN_PASSWORD:-}
+      # Mail (set in the DSM window): how invoices reach your clients.
+      MAIL_MAILER: ${MAIL_MAILER:-log}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM:-invoices@example.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Invoice Ninja}
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+  web:
+    image: ${WEB_IMAGE:-nginx:stable-alpine}
+    container_name: invoiceninja-web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "${HTTP_PORT:-8012}:8080"
+    volumes:
+      - web:/etc/nginx/conf.d:ro
+      - public:/var/www/html/public:ro
+      - storage:/var/www/html/storage:ro
+    environment:
+      TZ: ${TZ:-UTC}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null --no-check-certificate https://127.0.0.1:8080/health || wget -q -O /dev/null http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  public:
+  storage:
+  db:
+  web:
